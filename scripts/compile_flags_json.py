@@ -2,6 +2,7 @@
 import json
 import sys
 from pathlib import Path
+from typing import TypedDict
 
 EXTS = (
     ".c",
@@ -18,6 +19,13 @@ EXTS = (
     ".hxx",
 )
 
+
+class CompileCommand(TypedDict):
+    directory: str
+    file: str
+    arguments: list[str]
+
+
 compile_flags: Path = Path.cwd() / (
     sys.argv[1] if len(sys.argv) > 1 else "compile_flags.txt"
 )
@@ -27,7 +35,7 @@ with compile_flags.open("r") as f:
 
 project_dir: Path = compile_flags.parent
 
-compile_commands = []
+compile_commands: list[CompileCommand] = []
 
 for item in project_dir.glob("**/*"):
     if not item.is_file() and item.suffix not in EXTS:

@@ -33,19 +33,16 @@ with compile_flags.open("r") as f:
 
 project_dir: Path = compile_flags.parent
 
-compile_commands: List[CompileCommand] = []
+compile_commands: List[CompileCommand] = [
+    {
+        "directory": str(project_dir.absolute()),
+        "file": str(file_path.absolute()),
+        "arguments": [compiler] + flags + [str(file_path.absolute)],
+    }
+    for file_path in project_dir.glob("**/*")
+    if file_path.is_file() and file_path.suffix in EXTS
+]
 
-for item in project_dir.glob("**/*"):
-    if not (item.is_file() and item.suffix in EXTS):
-        continue
-
-    compile_commands.append(
-        {
-            "directory": str(project_dir.absolute()),
-            "file": str(item.absolute()),
-            "arguments": [compiler] + flags + [str(item.absolute())],
-        }
-    )
 
 with (project_dir / "compile_commands.json").open("w") as file:
     json.dump(compile_commands, file, indent=2)
